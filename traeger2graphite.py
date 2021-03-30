@@ -59,10 +59,6 @@ if __name__ == "__main__":
         config["username"] = input("username:")
     if "password" not in config:
         config["password"] = getpass.getpass()
-    if "graphite_port" not in config:
-        config["graphite_port"] = input("graphite port:")
-    if "graphite_host" not in config:
-        config["graphite_host"] = input("graphite host:")
 
     open(os.path.expanduser("~/.traeger"),"w").write(json.dumps(config))
 
@@ -75,23 +71,20 @@ if __name__ == "__main__":
         grills_status = t.get_grill_status()
         for grill in grills:
             if grill["thingName"] not in grills_status:
-                print ("Missing Data for {}".format(grill["thingName"]))
+                print("Missing Data for {}".format(grill["thingName"]))
 
         try:
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.connect((config["graphite_host"], int(config["graphite_port"])))
-            for k,v in unpack_dict([], grills_status):
-                s.send("traeger.{} {} {}\r\n".format(k, v, int(last_collect)).encode())
-            s.close()
+            for k,v in unpack_dict([], grills): 
+                print("{} {}".format(k, v))
         except Exception as e:
-            print (e)
+            print(e)
         next_collect = last_collect + 60
         until_collect = next_collect - time.time()
         if until_collect > 0:
-            print ("Sleeeping {}".format(until_collect))
+            print("Sleeeping {}".format(until_collect))
             time.sleep(until_collect)
         else:
-            print ("Late for next collection {}".format(until_collect))
+            print("Late for next collection {}".format(until_collect))
     
 
 
