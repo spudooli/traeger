@@ -42,8 +42,8 @@ def unpack_list(base, thelist):
 def unpack_dict(base, thedict):
     result = []
     for k, v in thedict.items():
-        if k == "custom_cook" and len(base) == 1:
-            pass
+        if k == "status":
+            print("kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk")
         else:
             newbase = base.copy()
             newbase.append(k)
@@ -81,7 +81,7 @@ if __name__ == "__main__":
         next_collect = last_collect + 60
         until_collect = next_collect - time.time()
         if until_collect > 0:
-            print("Sleeeping {}".format(until_collect))
+            print("Sleeeping")
             time.sleep(until_collect)
         else:
             print("Late for next collection {}".format(until_collect))

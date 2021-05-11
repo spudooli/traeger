@@ -14,6 +14,7 @@ import requests
 import uuid
 import urllib
 import json
+from rrdtool import update as rrd_update
 
 
 CLIENT_ID = "2fuohjtqv1e63dckp5v84rau0j"
@@ -58,6 +59,7 @@ class traeger:
     def get_grills(self):
         json = self.get_user_data()
         self.grills = json["things"]
+        #print(json)
         return self.grills
 
     def mqtt_url_remaining(self):
@@ -93,10 +95,16 @@ class traeger:
         return self.mqtt_client
 
     def grill_message(self, client, userdata, message):
+        #print(message.payload)
         if message.topic.startswith("prod/thing/update/"):
             grill_id = message.topic[len("prod/thing/update/"):]
             self.grill_status[grill_id] = json.loads(message.payload)
-        
+            self.grillTemp = self.grill_status[grill_id]["status"]["grill"]
+            self.probeTemp = self.grill_status[grill_id]["status"]["probe"]
+            print("Grill temp", self.grillTemp, " Set Temp ", self.grill_status[grill_id]["status"]["set"], "Probe Temp", self.probeTemp)
+            print("Pellets", self.grill_status[grill_id]["status"]["pellet_level"], "%")
+            self.ret = rrd_update('/var/www/scripts/bbq-temperatures.rrd', 'N:%s' %(self.grillTemp))
+            self.ret = rrd_update('/var/www/scripts/traeger-temperatures.rrd', 'N:%s:%s' %(self.grillTemp, self.probeTemp))
     def grill_connect(self, client, userdata, flags, rc):
         pass
     
